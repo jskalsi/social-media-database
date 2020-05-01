@@ -1,0 +1,101 @@
+1.	Select user first name, last name, and userID where user has at least one image and one link in post.
+
+SELECT U.USERID, U.FIRSTNAME, U.LASTNAME
+FROM USERS U
+INNER JOIN POST P ON U.USERID = P.USERID
+INNER JOIN IMAGES IMG On P.POSTID = IMG.POSTID
+INNER JOIN Link L ON P.POSTID = L.POSTID;
+
+2. 	Show number of posts each user has. Order by UserID.
+
+SELECT U.USERID, COUNT(P.POSTID)
+FROM POST P
+INNER JOIN
+USERS U ON P.USERID = U.USERID
+GROUP BY U.USERID
+ORDER BY USERID;
+
+3.	Show the PostID and number of likes each post has. Order by PostID.
+
+SELECT P.POSTID, COUNT(L.POSTID) AS NUM_LIKES
+FROM POST P
+FULL OUTER JOIN 
+LIKES L ON P.POSTID = L.POSTID
+GROUP BY P.POSTID
+ORDER BY P.POSTID;
+
+4. 	Create a view showing the userid and postid of posts that have been posted in 2017.
+
+CREATE VIEW POSTS_IN_2017 AS
+SELECT P.POSTID, P.USERID
+FROM POST P 
+WHERE PDATETIME >= TO_DATE('2017-01-01', 'yyyy/mm/dd') AND PDATETIME < TO_DATE('2018-01-01', 'yyyy/mm/dd');
+
+5.	Retrieve the commentID of comments only replied directly to a post (exclude those that reply to a comment)
+
+SELECT CommentID
+FROM COMMENTS
+WHERE HigherCommentID IS NULL;
+
+6.	Retrieve UserID, first name, and last name of user(s) who have not commented on any post or comment.
+
+SELECT USERID, FIRSTNAME, LASTNAME
+FROM USERS 
+WHERE USERID NOT IN
+(SELECT USERID 
+FROM COMMENTS);
+
+7.	Retrieve UserID of user(s) who have not posted any posts.
+
+SELECT U.USERID 
+FROM USERS U 
+WHERE U.USERID NOT IN 
+(SELECT USERID 
+FROM POST);
+
+8.	Retrieve userID of users who have replied to a comment (exclude those that commented directly to the post).
+
+SELECT USERID 
+FROM USERS 
+WHERE USERID NOT IN
+(SELECT USERID 
+FROM COMMENTS 
+WHERE HIGHERCOMMENTID IS NULL);
+
+9.	Retrieve the UserID and number of comments each user has made. Order by userID.
+
+SELECT P.POSTID, COUNT(L.POSTID) AS NUM_LIKES
+FROM POST P
+FULL OUTER JOIN 
+LIKES L ON P.POSTID = L.POSTID
+GROUP BY P.POSTID
+ORDER BY P.POSTID;
+
+10.	Retrieve the cartesian product of Users and Post
+
+SELECT *
+FROM USERS 
+CROSS JOIN 
+POST;
+
+11.	Retrieve UserID, first name, last name, postid, and link of posts made in 2018
+
+SELECT P.POSTID, U.USERID, U.FIRSTNAME, U.LASTNAME, L.URL
+FROM 
+(SELECT POSTID, USERID
+FROM POST 
+WHERE PDATETIME >= TO_DATE('2018-01-01', 'yyyy/mm/dd') AND PDATETIME < TO_DATE('2019-01-01', 'yyyy/mm/dd')) P
+LEFT JOIN 
+USERS U ON P.USERID = U.USERID
+LEFT JOIN 
+LINK L ON L.POSTID = P.POSTID;
+
+12. 	List the CommentIDs of comments made by Adam Lam
+
+SELECT C.COMMENTID
+FROM COMMENTS C
+WHERE C.USERID IN 
+(SELECT USERID 
+FROM USERS 
+WHERE FIRSTNAME = 'Adam' AND LASTNAME = 'Lam'); 
+
